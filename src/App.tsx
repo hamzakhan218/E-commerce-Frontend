@@ -1,8 +1,17 @@
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import SignIn from "./components/SignIn/SignIn"
+import SignUp from "./components/Signup/Signup";
+
 function App() {
 
   return (
     <>
-    <p className='underline font-extralight text-6xl'>Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloremque, recusandae quod asperiores eligendi ipsam sit at impedit commodi, aliquid aperiam rem tempora autem fuga quis? Perferendis officiis consequatur ipsam assumenda!</p>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/signin" element={<SignIn/>} />
+          <Route path="/signup" element={<SignUp/>} />
+        </Routes>
+      </BrowserRouter>
     </>
   )
 }
