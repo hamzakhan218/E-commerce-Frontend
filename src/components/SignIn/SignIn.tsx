@@ -12,6 +12,10 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import axios from "axios";
+import { toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import {useNavigate} from "react-router-dom";
 
 function Copyright(props: any) {
   return (
@@ -28,13 +32,28 @@ function Copyright(props: any) {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const res = new FormData(event.currentTarget);
+    const data = {
+      email: res.get('email'),
+      password: res.get('password')
+    }
+    axios.post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, data)
+    .then((res) => {
+      if(res.data?.access_token){
+        localStorage.setItem("token",res.data.access_token)
+        navigate("/dashboard")
+      }
+      else{
+        toast(res.data);
+      }
+      
+    }).catch((error)=>{
+      toast(error.response.data.message[0])
+    })
   };
 
   return (
