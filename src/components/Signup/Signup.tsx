@@ -44,7 +44,6 @@ export default function SignUp() {
     axios.post(`${import.meta.env.VITE_BACKEND_URL}/users`, data)
     .then((response) => {
       if(response.data?.id){
-        console.log("ID received")
         toast("Account created please login")
         navigate("/signin")
       }
