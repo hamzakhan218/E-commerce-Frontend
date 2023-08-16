@@ -18,11 +18,22 @@ import {
   toggleRecentOrders,
   toggleYourProducts,
 } from "../../features/dashboard/dashboardSlice";
+type storeType = {
+  dashboard: {
+    recentOrders: boolean;
+    cart: boolean;
+    browseProducts: boolean;
+    yourProducts: boolean;
+    addProduct: boolean;
+  };
+  cart: {
+    numberOfItems: number;
+  };
+};
 
 function ListItems() {
   const dispatch = useDispatch();
-  const dashboard = useSelector((state) => state.dashboard);
-
+  const store: storeType = useSelector<storeType>((state) => state);
   return (
     <React.Fragment>
       {/* <ListItemButton onClick={() => dispatch(toggleAddProduct())}>
@@ -34,25 +45,25 @@ function ListItems() {
       <ListItemButton onClick={() => dispatch(toggleRecentOrders())}>
         <ListItemIcon>
           <ReceiptLongIcon
-            color={dashboard.recentOrders ? `secondary` : "inherit"}
-            fontSize={dashboard.recentOrders ? "large" : "medium"}
+            color={store.dashboard.recentOrders ? `secondary` : "inherit"}
+            fontSize={store.dashboard.recentOrders ? "large" : "medium"}
           />
         </ListItemIcon>
         <ListItemText
           primary='Recent Orders'
           disableTypography
           sx={{
-            fontSize: dashboard.recentOrders ? "1.3rem" : "1rem",
-            color: dashboard.recentOrders ? "#9C27B0" : "inherit",
+            fontSize: store.dashboard.recentOrders ? "1.3rem" : "1rem",
+            color: store.dashboard.recentOrders ? "#9C27B0" : "inherit",
           }}
         />
       </ListItemButton>
       <ListItemButton onClick={() => dispatch(toggleCart())}>
         <ListItemIcon>
-          <Badge color='primary' badgeContent={99}>
+          <Badge color='primary' badgeContent={store.cart.numberOfItems}>
             <ShoppingCartIcon
-              color={dashboard.cart ? `secondary` : "inherit"}
-              fontSize={dashboard.cart ? "large" : "medium"}
+              color={store.dashboard.cart ? `secondary` : "inherit"}
+              fontSize={store.dashboard.cart ? "large" : "medium"}
             />
           </Badge>
         </ListItemIcon>
@@ -60,56 +71,56 @@ function ListItems() {
           primary='Cart'
           disableTypography
           sx={{
-            fontSize: dashboard.cart ? "1.3rem" : "1rem",
-            color: dashboard.cart ? "#9C27B0" : "inherit",
+            fontSize: store.dashboard.cart ? "1.3rem" : "1rem",
+            color: store.dashboard.cart ? "#9C27B0" : "inherit",
           }}
         />
       </ListItemButton>
       <ListItemButton onClick={() => dispatch(toggleBrowseProducts())}>
         <ListItemIcon>
           <CategoryIcon
-            color={dashboard.browseProducts ? "secondary" : "inherit"}
-            fontSize={dashboard.browseProducts ? "large" : "medium"}
+            color={store.dashboard.browseProducts ? "secondary" : "inherit"}
+            fontSize={store.dashboard.browseProducts ? "large" : "medium"}
           />
         </ListItemIcon>
         <ListItemText
           primary='Browse Products'
           disableTypography
           sx={{
-            fontSize: dashboard.browseProducts ? "1.3rem" : "1rem",
-            color: dashboard.browseProducts ? "#9C27B0" : "inherit",
+            fontSize: store.dashboard.browseProducts ? "1.3rem" : "1rem",
+            color: store.dashboard.browseProducts ? "#9C27B0" : "inherit",
           }}
         />
       </ListItemButton>
       <ListItemButton onClick={() => dispatch(toggleYourProducts())}>
         <ListItemIcon>
           <InventoryIcon
-            color={dashboard.yourProducts ? `secondary` : "inherit"}
-            fontSize={dashboard.yourProducts ? "large" : "medium"}
+            color={store.dashboard.yourProducts ? `secondary` : "inherit"}
+            fontSize={store.dashboard.yourProducts ? "large" : "medium"}
           />
         </ListItemIcon>
         <ListItemText
           primary='Your Products'
           disableTypography
           sx={{
-            fontSize: dashboard.yourProducts ? "1.3rem" : "1rem",
-            color: dashboard.yourProducts ? "#9C27B0" : "inherit",
+            fontSize: store.dashboard.yourProducts ? "1.3rem" : "1rem",
+            color: store.dashboard.yourProducts ? "#9C27B0" : "inherit",
           }}
         />
       </ListItemButton>
       <ListItemButton onClick={() => dispatch(toggleAddProduct())}>
         <ListItemIcon>
           <AddCircleIcon
-            color={dashboard.addProduct ? `secondary` : "inherit"}
-            fontSize={dashboard.addProduct ? "large" : "medium"}
+            color={store.dashboard.addProduct ? `secondary` : "inherit"}
+            fontSize={store.dashboard.addProduct ? "large" : "medium"}
           />
         </ListItemIcon>
         <ListItemText
           primary='Add a Product'
           disableTypography
           sx={{
-            fontSize: dashboard.addProduct ? "1.3rem" : "1rem",
-            color: dashboard.addProduct ? "#9C27B0" : "inherit",
+            fontSize: store.dashboard.addProduct ? "1.3rem" : "1rem",
+            color: store.dashboard.addProduct ? "#9C27B0" : "inherit",
           }}
         />
       </ListItemButton>

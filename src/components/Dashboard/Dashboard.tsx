@@ -21,9 +21,13 @@ import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
-import Product from "../Products/Prodcuts";
+import Product from "../Products/ListProduct";
 import ListItems from "./listItems";
 import { useSelector } from "react-redux";
+import AddProduct from "./AddProduct";
+import BrowseProducts from "./BrowseProducts";
+import YourProducts from "./YourProducts";
+import Checkout from "../Checkout/Checkout";
 
 function Copyright(props: any) {
   return (
@@ -125,6 +129,7 @@ export default function Dashboard() {
     const token: string = localStorage.getItem("token")!;
     setUser(decodeToken(token)!);
   }, []);
+
   React.useEffect(() => {
     const fetchProducts = async () => {
       const response = await fetch("https://fakestoreapi.com/products");
@@ -229,14 +234,9 @@ export default function Dashboard() {
           <Toolbar />
           <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {/* Browse Products */}
               {dashboard.browseProducts && (
                 <Grid item xs={12} md={12} lg={12}>
-                  <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
-                    {products.map((product) => {
-                      return <Product product={product} />;
-                    })}
-                  </div>
+                  <BrowseProducts />
                 </Grid>
               )}
               {dashboard.recentOrders && (
@@ -248,23 +248,20 @@ export default function Dashboard() {
               )}
               {dashboard.cart && (
                 <Grid item xs={12} md={12} lg={12}>
-                  <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
-                    Cart
-                  </div>
+                  <Checkout />
                 </Grid>
               )}
               {dashboard.yourProducts && (
                 <Grid item xs={12} md={12} lg={12}>
-                  <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
-                    Your Products
-                  </div>
+                  <YourProducts />
                 </Grid>
               )}
               {dashboard.addProduct && (
                 <Grid item xs={12} md={12} lg={12}>
-                  <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
+                  <AddProduct />
+                  {/* <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
                     Add a product
-                  </div>
+                  </div> */}
                 </Grid>
               )}
             </Grid>
