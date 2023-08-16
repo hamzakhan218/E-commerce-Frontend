@@ -1,11 +1,5 @@
 import { createSlice } from "@reduxjs/toolkit";
-const defaultValues = {
-  recentOrders: false,
-  cart: false,
-  browseProducts: false,
-  yourProducts: false,
-  addProduct: false,
-};
+
 export const dashboardSlice = createSlice({
   name: "dashboard",
   initialState: {
