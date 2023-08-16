@@ -1,35 +1,33 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  createTheme,
+  ThemeProvider,
+  LinearProgress,
+} from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import axios from "axios";
 import { decodeToken } from "react-jwt";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
-import { useNavigate } from "react-router-dom";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AddAPhotoIcon from "@mui/icons-material/AddAPhoto";
 import ImageUploader, { FileObjectType } from "react-image-upload";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import LinearProgress from "@mui/material/LinearProgress";
+import "react-toastify/dist/ReactToastify.css";
 import "react-image-upload/dist/index.css";
 
 const defaultTheme = createTheme();
 
 function AddProduct() {
-  const navigate = useNavigate();
   const [fileUploadStatus, setFileUploadStatus] = React.useState(true);
   const [file, setFile] = React.useState<string>();
   const [date, setDate] = React.useState<Date | null>(null);
-  const [ownerEmail, setOwnerEmail] = React.useState<string>("");
   const [progress, setProgress] = React.useState<number>(0);
 
   async function getImageFileObject(imageFile: { file: File }) {
@@ -57,6 +55,7 @@ function AddProduct() {
           setProgress(progress);
         },
       });
+
       const filePath: string =
         "https://ipfs.io/ipfs/" +
         response.data.value.cid +
@@ -73,20 +72,22 @@ function AddProduct() {
     event.preventDefault();
     const res = new FormData(event.currentTarget);
     const token: string = localStorage.getItem("token")!;
-    const email: string = decodeToken(token).email;
-    const backendURL: string = import.meta.env.VITE_BACKEND_URL;
+    const decodedToken: { email: string } = decodeToken<{ email: string }>(
+      token
+    )!;
+    const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
     const data = {
       name: res.get("name"),
       price: parseInt(res.get("price")),
       image: file,
       publishDate: date,
-      ownerEmail: email,
+      ownerEmail: decodedToken.email,
       description: res.get("description"),
       category: res.get("category"),
       stock: parseInt(res.get("stock")),
     };
-    console.log(data);
+
     axios
       .post(`${backendURL}/products`, data)
       .then((res) => {

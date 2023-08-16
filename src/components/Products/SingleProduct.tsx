@@ -1,15 +1,17 @@
 import React from "react";
 import { useParams } from "react-router-dom";
-import { Product } from "../Dashboard/BrowseProducts";
 import axios from "axios";
+
+import { Product } from "../Dashboard/BrowseProducts";
 
 function SingleProduct() {
   const { id } = useParams();
   const [product, setproduct] = React.useState<Product>();
+  const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
   const fetchData = async () => {
     const response: { data: Product } = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/products/${id!}`
+      `${backendURL}/products/${id!}`
     );
     setproduct(response.data);
   };
@@ -20,6 +22,7 @@ function SingleProduct() {
     };
     initialRun();
   });
+
   return (
     <div className='outline '>
       <div className='border border-[#e4e4e4] h-[500px] w-full flex justify-center mb-4 relative overflow-hidden group transition'>
@@ -38,11 +41,9 @@ function SingleProduct() {
           {product?.category}
         </div>
         <div className='text-sm font-thin'>
-          {/* <Link to={`/products/${id}`}> */}
           <h2 className='  mb-1 font-medium'>{product?.name}</h2>
           <h2 className=' font-thin mb-1'>{product?.description}</h2>
           <h2 className='  mb-1 font-medium'>Stock: {product?.stock}</h2>
-          {/* </Link> */}
         </div>
         <div className=' text-center font-bold'> ${product?.price}</div>
       </div>

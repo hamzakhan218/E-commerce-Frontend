@@ -1,35 +1,46 @@
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-inferrable-types */
 import * as React from "react";
-import { styled, createTheme, ThemeProvider } from "@mui/material/styles";
-import CssBaseline from "@mui/material/CssBaseline";
+import {
+  styled,
+  createTheme,
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Grid,
+  Badge,
+  Container,
+  Link,
+  Toolbar,
+  Typography,
+  List,
+  Divider,
+  IconButton,
+  AppBarProps as MuiAppBarProps,
+} from "@mui/material";
 import MuiDrawer from "@mui/material/Drawer";
-import Box from "@mui/material/Box";
-import MuiAppBar, { AppBarProps as MuiAppBarProps } from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import List from "@mui/material/List";
-import Typography from "@mui/material/Typography";
-import Divider from "@mui/material/Divider";
-import IconButton from "@mui/material/IconButton";
-import Badge from "@mui/material/Badge";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Link from "@mui/material/Link";
+import MuiAppBar from "@mui/material/AppBar";
 import MenuIcon from "@mui/icons-material/Menu";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import { useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
-import Product from "../Products/ListProduct";
-import ListItems from "./listItems";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import axios from "axios";
+
+import ListItems, { storeType } from "./listItems";
 import AddProduct from "./AddProduct";
 import BrowseProducts from "./BrowseProducts";
 import YourProducts from "./YourProducts";
 import Checkout from "../Checkout/Checkout";
+import { addSpecificAmount } from "../../features/store/storeSlice";
 
-function Copyright(props: any) {
+function Copyright(props: {
+  sx: {
+    pt: number;
+  };
+}) {
+  const backendURL = import.meta.env.VITE_BACKEND_URL as string;
+
   return (
     <Typography
       variant='body2'
@@ -38,7 +49,7 @@ function Copyright(props: any) {
       {...props}
     >
       {"Copyright © "}
-      <Link color='inherit' href={import.meta.env.VITE_FRONTEND_URL}>
+      <Link color='inherit' href={backendURL}>
         Your Website
       </Link>{" "}
       {new Date().getFullYear()}
@@ -47,7 +58,7 @@ function Copyright(props: any) {
   );
 }
 
-const drawerWidth: number = 240;
+const drawerWidth = 240;
 
 interface AppBarProps extends MuiAppBarProps {
   open?: boolean;
@@ -97,7 +108,6 @@ const Drawer = styled(MuiDrawer, {
   },
 }));
 
-// TODO remove, this demo shouldn't need to reset the theme.
 const defaultTheme = createTheme();
 
 export default function Dashboard() {
@@ -106,9 +116,13 @@ export default function Dashboard() {
   const [user, setUser] = React.useState({
     name: "",
   });
-  const [products, setProducts] = React.useState([]);
+  const backendURL = import.meta.env.VITE_BACKEND_URL as string;
+
   const navigate = useNavigate();
-  const dashboard = useSelector((state) => state.dashboard);
+  const dispatch = useDispatch();
+
+  const store = useSelector<storeType, storeType>((state) => state);
+
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -131,12 +145,17 @@ export default function Dashboard() {
   }, []);
 
   React.useEffect(() => {
-    const fetchProducts = async () => {
-      const response = await fetch("https://fakestoreapi.com/products");
-      const data = await response.json();
-      setProducts(data);
+    const fetchCart = async () => {
+      const token: string = localStorage.getItem("token")!;
+      const decodedToken: { email: string } = decodeToken<{ email: string }>(
+        token
+      )!;
+      const response: { data: { items: [] } } = await axios.get(
+        `${backendURL}/cart/email/${decodedToken.email}`
+      );
+      dispatch(addSpecificAmount(response.data.items.length));
     };
-    fetchProducts();
+    fetchCart();
   }, []);
 
   return (
@@ -146,7 +165,7 @@ export default function Dashboard() {
         <AppBar position='absolute' open={open}>
           <Toolbar
             sx={{
-              pr: "24px", // keep right padding when drawer closed
+              pr: "24px",
             }}
           >
             <IconButton
@@ -234,34 +253,31 @@ export default function Dashboard() {
           <Toolbar />
           <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
             <Grid container spacing={3}>
-              {dashboard.browseProducts && (
+              {store.dashboard.browseProducts && (
                 <Grid item xs={12} md={12} lg={12}>
                   <BrowseProducts />
                 </Grid>
               )}
-              {dashboard.recentOrders && (
+              {store.dashboard.recentOrders && (
                 <Grid item xs={12} md={12} lg={12}>
                   <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
                     Recent Orders
                   </div>
                 </Grid>
               )}
-              {dashboard.cart && (
+              {store.dashboard.cart && (
                 <Grid item xs={12} md={12} lg={12}>
                   <Checkout />
                 </Grid>
               )}
-              {dashboard.yourProducts && (
+              {store.dashboard.yourProducts && (
                 <Grid item xs={12} md={12} lg={12}>
                   <YourProducts />
                 </Grid>
               )}
-              {dashboard.addProduct && (
+              {store.dashboard.addProduct && (
                 <Grid item xs={12} md={12} lg={12}>
                   <AddProduct />
-                  {/* <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
-                    Add a product
-                  </div> */}
                 </Grid>
               )}
             </Grid>

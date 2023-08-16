@@ -1,23 +1,33 @@
 import * as React from "react";
-import Avatar from "@mui/material/Avatar";
-import Button from "@mui/material/Button";
-import CssBaseline from "@mui/material/CssBaseline";
-import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
-import Link from "@mui/material/Link";
-import Grid from "@mui/material/Grid";
-import Box from "@mui/material/Box";
+import {
+  Avatar,
+  Button,
+  CssBaseline,
+  TextField,
+  FormControlLabel,
+  Checkbox,
+  Link,
+  Grid,
+  Box,
+  Typography,
+  Container,
+  createTheme,
+  ThemeProvider,
+} from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
-import Typography from "@mui/material/Typography";
-import Container from "@mui/material/Container";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
 import axios from "axios";
 import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
 import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
-function Copyright(props: any) {
+function Copyright(props: {
+  sx: {
+    mt: number;
+    mb: number;
+  };
+}) {
+  const frontendURL = import.meta.env.VITE_FRONTEND_URL as string;
+
   return (
     <Typography
       variant='body2'
@@ -26,7 +36,7 @@ function Copyright(props: any) {
       {...props}
     >
       {"Copyright © "}
-      <Link color='inherit' href={import.meta.env.VITE_FRONTEND_URL}>
+      <Link color='inherit' href={frontendURL}>
         E-commerce
       </Link>{" "}
       {new Date().getFullYear()}
@@ -38,25 +48,28 @@ const defaultTheme = createTheme();
 
 export default function SignIn() {
   const navigate = useNavigate();
+  const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const res = new FormData(event.currentTarget);
+
     const data = {
       email: res.get("email"),
       password: res.get("password"),
     };
+
     axios
-      .post(`${import.meta.env.VITE_BACKEND_URL}/auth/login`, data)
-      .then((res) => {
-        if (res.data?.access_token) {
+      .post(`${backendURL}/auth/login`, data)
+      .then((res: { data: { access_token: string } }) => {
+        if (res.data.access_token) {
           localStorage.setItem("token", res.data.access_token);
           navigate("/");
         } else {
           toast(res.data);
         }
       })
-      .catch((error) => {
+      .catch((error: { response: { data: { message: string[] } } }) => {
         toast(error.response.data.message[0]);
       });
   };

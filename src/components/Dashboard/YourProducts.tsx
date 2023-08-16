@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import axios from "axios";
 import { decodeToken } from "react-jwt";
@@ -10,10 +8,14 @@ function YourProducts() {
   const [products, setProducts] = React.useState<Product[]>();
 
   const fetchData = async () => {
+    const backendURL = import.meta.env.VITE_BACKEND_URL as string;
     const token: string = localStorage.getItem("token")!;
-    const email = decodeToken(token).email;
+    const decodedToken: { email: string } = decodeToken<{ email: string }>(
+      token
+    )!;
+
     const response: { data: Product[] } = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/products/users/${email}`
+      `${backendURL}/products/users/${decodedToken.email}`
     );
     setProducts(response.data);
   };
@@ -21,6 +23,7 @@ function YourProducts() {
   React.useEffect(() => {
     fetchData();
   }, []);
+
   return (
     <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
       {products?.map((product: Product) => {

@@ -1,15 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 import * as React from "react";
-import ListItemButton from "@mui/material/ListItemButton";
-import ListItemIcon from "@mui/material/ListItemIcon";
-import ListItemText from "@mui/material/ListItemText";
-import DashboardIcon from "@mui/icons-material/Dashboard";
+import {
+  ListItemButton,
+  ListItemIcon,
+  ListItemText,
+  Badge,
+} from "@mui/material";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import InventoryIcon from "@mui/icons-material/Inventory";
 import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import CategoryIcon from "@mui/icons-material/Category";
-import Badge from "@mui/material/Badge";
 import { useDispatch, useSelector } from "react-redux";
 import {
   toggleAddProduct,
@@ -18,7 +19,8 @@ import {
   toggleRecentOrders,
   toggleYourProducts,
 } from "../../features/dashboard/dashboardSlice";
-type storeType = {
+
+export type storeType = {
   dashboard: {
     recentOrders: boolean;
     cart: boolean;
@@ -33,15 +35,10 @@ type storeType = {
 
 function ListItems() {
   const dispatch = useDispatch();
-  const store: storeType = useSelector<storeType>((state) => state);
+  const store: storeType = useSelector<storeType, storeType>((state) => state);
+
   return (
     <React.Fragment>
-      {/* <ListItemButton onClick={() => dispatch(toggleAddProduct())}>
-        <ListItemIcon>
-          <DashboardIcon />
-        </ListItemIcon>
-        <ListItemText primary='Dashboard' />
-      </ListItemButton> */}
       <ListItemButton onClick={() => dispatch(toggleRecentOrders())}>
         <ListItemIcon>
           <ReceiptLongIcon
