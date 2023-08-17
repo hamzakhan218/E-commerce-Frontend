@@ -1,6 +1,7 @@
 import React from "react";
-import Product from "../Products/ListProduct";
 import axios from "axios";
+
+import Product from "../Products/ListProduct";
 
 export type productType = {
   reviewerName: string;
@@ -8,6 +9,7 @@ export type productType = {
   stars: number;
   comment: string;
 };
+
 export type Product = {
   _id: string;
   name: string;
@@ -20,18 +22,22 @@ export type Product = {
   stock: number;
   reviews: productType[];
 };
-function BrowseProducts(): Promise<Product[]> {
+
+function BrowseProducts() {
   const [products, setProducts] = React.useState<Product[]>([]);
+  const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
   const fetchProducts = async () => {
     const response: { data: Product[] } = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/products`
+      `${backendURL}/products`
     );
     setProducts(response.data);
   };
+
   React.useEffect(() => {
     fetchProducts();
   }, []);
+
   return (
     <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
       {products.map((product: Product) => {

@@ -1,10 +1,11 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import SignIn from "./components/SignIn/SignIn";
-import SignUp from "./components/Signup/Signup";
 import { ToastContainer } from "react-toastify";
 import { Provider } from "react-redux";
-import Dashboard from "./components/Dashboard/Dashboard";
+
 import Checkout from "./components/Checkout/Checkout";
+import Dashboard from "./components/Dashboard/Dashboard";
+import SignIn from "./components/SignIn/SignIn";
+import SignUp from "./components/Signup/Signup";
 import store from "./store";
 import SingleProduct from "./components/Products/SingleProduct";
 
