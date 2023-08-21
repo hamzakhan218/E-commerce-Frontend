@@ -26,6 +26,7 @@ import { useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
 import { useSelector, useDispatch } from "react-redux";
 import axios from "axios";
+import { ColorRing } from "react-loader-spinner";
 
 import ListItems, { storeType } from "./listItems";
 import AddProduct from "./AddProduct";
@@ -112,6 +113,7 @@ const defaultTheme = createTheme();
 
 export default function Dashboard() {
   const [open, setOpen] = React.useState(true);
+  const [loader, setLoader] = React.useState(true);
   const [openProfile, setOpenProfile] = React.useState(true);
   const [user, setUser] = React.useState({
     name: "",
@@ -139,152 +141,167 @@ export default function Dashboard() {
   React.useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/signin");
-    }
-    const token: string = localStorage.getItem("token")!;
-    setUser(decodeToken(token)!);
-  }, []);
-
-  React.useEffect(() => {
-    const fetchCart = async () => {
+    } else {
       const token: string = localStorage.getItem("token")!;
-      const decodedToken: { email: string } = decodeToken<{ email: string }>(
-        token
-      )!;
-      const response: { data: { items: [] } } = await axios.get(
-        `${backendURL}/cart/email/${decodedToken.email}`
-      );
-      dispatch(addSpecificAmount(response.data.items.length));
-    };
-    fetchCart();
+      setUser(decodeToken(token)!);
+      const fetchCart = async () => {
+        const token: string = localStorage.getItem("token")!;
+        const decodedToken: { email: string } = decodeToken<{ email: string }>(
+          token
+        )!;
+        const response: { data: { items: [] } } = await axios.get(
+          `${backendURL}/cart/email/${decodedToken.email}`
+        );
+        console.log(response);
+        dispatch(addSpecificAmount(response.data.items.length));
+        setLoader(false);
+      };
+      fetchCart();
+    }
   }, []);
 
   return (
     <ThemeProvider theme={defaultTheme}>
-      <Box sx={{ display: "flex" }}>
-        <CssBaseline />
-        <AppBar position='absolute' open={open}>
-          <Toolbar
-            sx={{
-              pr: "24px",
-            }}
-          >
-            <IconButton
-              edge='start'
-              color='inherit'
-              aria-label='open drawer'
-              onClick={toggleDrawer}
+      {loader && (
+        <Box className=' flex justify-center items-center h-[750px]'>
+          <ColorRing
+            visible={true}
+            height='180'
+            width='180'
+            ariaLabel='blocks-loading'
+            wrapperStyle={{}}
+            wrapperClass='blocks-wrapper'
+            colors={["#1976d2", "#1976d2", "#1976d2", "#1976d2", "#1976d2"]}
+          />
+        </Box>
+      )}
+      {!loader && (
+        <Box sx={{ display: "flex" }}>
+          <CssBaseline />
+          <AppBar position='absolute' open={open}>
+            <Toolbar
               sx={{
-                marginRight: "36px",
-                ...(open && { display: "none" }),
+                pr: "24px",
               }}
             >
-              <MenuIcon />
-            </IconButton>
-            <Typography
-              component='h1'
-              variant='h6'
-              color='inherit'
-              noWrap
-              sx={{ flexGrow: 1 }}
+              <IconButton
+                edge='start'
+                color='inherit'
+                aria-label='open drawer'
+                onClick={toggleDrawer}
+                sx={{
+                  marginRight: "36px",
+                  ...(open && { display: "none" }),
+                }}
+              >
+                <MenuIcon />
+              </IconButton>
+              <Typography
+                component='h1'
+                variant='h6'
+                color='inherit'
+                noWrap
+                sx={{ flexGrow: 1 }}
+              >
+                My e-commerce App
+              </Typography>
+              <IconButton color='inherit'>
+                <Badge color='secondary'>
+                  <AccountCircleIcon fontSize='large' onClick={toggleProfile} />
+                </Badge>
+              </IconButton>
+            </Toolbar>
+            <Container
+              sx={{
+                display: "flex",
+                paddingBottom: "10px",
+                justifyContent: "end",
+                marginLeft: "auto",
+                textAlign: "center",
+                borderRadius: "5px",
+                ...(openProfile && { display: "none" }),
+              }}
             >
-              My e-commerce App
-            </Typography>
-            <IconButton color='inherit'>
-              <Badge color='secondary'>
-                <AccountCircleIcon fontSize='large' onClick={toggleProfile} />
-              </Badge>
-            </IconButton>
-          </Toolbar>
-          <Container
+              <div className='bg-white rounded px-2  grid text-black font-thin py-3'>
+                <h2 className='py-1'>{user?.name}</h2>
+                <h2 className='py-1'>Profile Setting</h2>
+                <button className='py-1' onClick={logout}>
+                  Logout
+                  <LogoutIcon
+                    sx={{
+                      marginLeft: "5px",
+                    }}
+                  />
+                </button>
+              </div>
+            </Container>
+          </AppBar>
+          <Drawer variant='permanent' open={open}>
+            <Toolbar
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                px: [1],
+              }}
+            >
+              <IconButton onClick={toggleDrawer}>
+                <ChevronLeftIcon />
+              </IconButton>
+            </Toolbar>
+            <Divider />
+            <List component='nav'>
+              <ListItems />
+            </List>
+          </Drawer>
+          <Box
+            component='main'
             sx={{
-              display: "flex",
-              paddingBottom: "10px",
-              justifyContent: "end",
-              marginLeft: "auto",
-              textAlign: "center",
-              borderRadius: "5px",
-              ...(openProfile && { display: "none" }),
+              backgroundColor: (theme) =>
+                theme.palette.mode === "light"
+                  ? theme.palette.grey[100]
+                  : theme.palette.grey[900],
+              flexGrow: 1,
+              height: "100vh",
+              overflow: "auto",
             }}
           >
-            <div className='bg-white rounded px-2  grid text-black font-thin py-3'>
-              <h2 className='py-1'>{user?.name}</h2>
-              <h2 className='py-1'>Profile Setting</h2>
-              <button className='py-1' onClick={logout}>
-                Logout
-                <LogoutIcon
-                  sx={{
-                    marginLeft: "5px",
-                  }}
-                />
-              </button>
-            </div>
-          </Container>
-        </AppBar>
-        <Drawer variant='permanent' open={open}>
-          <Toolbar
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "flex-end",
-              px: [1],
-            }}
-          >
-            <IconButton onClick={toggleDrawer}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Toolbar>
-          <Divider />
-          <List component='nav'>
-            <ListItems />
-          </List>
-        </Drawer>
-        <Box
-          component='main'
-          sx={{
-            backgroundColor: (theme) =>
-              theme.palette.mode === "light"
-                ? theme.palette.grey[100]
-                : theme.palette.grey[900],
-            flexGrow: 1,
-            height: "100vh",
-            overflow: "auto",
-          }}
-        >
-          <Toolbar />
-          <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
-            <Grid container spacing={3}>
-              {store.dashboard.browseProducts && (
-                <Grid item xs={12} md={12} lg={12}>
-                  <BrowseProducts />
-                </Grid>
-              )}
-              {store.dashboard.recentOrders && (
-                <Grid item xs={12} md={12} lg={12}>
-                  <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
-                    Recent Orders
-                  </div>
-                </Grid>
-              )}
-              {store.dashboard.cart && (
-                <Grid item xs={12} md={12} lg={12}>
-                  <Checkout />
-                </Grid>
-              )}
-              {store.dashboard.yourProducts && (
-                <Grid item xs={12} md={12} lg={12}>
-                  <YourProducts />
-                </Grid>
-              )}
-              {store.dashboard.addProduct && (
-                <Grid item xs={12} md={12} lg={12}>
-                  <AddProduct />
-                </Grid>
-              )}
-            </Grid>
-            <Copyright sx={{ pt: 4 }} />
-          </Container>
+            <Toolbar />
+            <Container maxWidth='lg' sx={{ mt: 4, mb: 4 }}>
+              <Grid container spacing={3}>
+                {store.dashboard.browseProducts && (
+                  <Grid item xs={12} md={12} lg={12}>
+                    <BrowseProducts />
+                  </Grid>
+                )}
+                {store.dashboard.recentOrders && (
+                  <Grid item xs={12} md={12} lg={12}>
+                    <div className='grid grid-cols-1 bg-white md:grid-cols-2 lg:grid-cols-4 xl:grid-cols-4 gap-[30px] max-w-sm mx-auto md:max-w-none md:mx-20'>
+                      Recent Orders
+                    </div>
+                  </Grid>
+                )}
+                {store.dashboard.cart && (
+                  <Grid item xs={12} md={12} lg={12}>
+                    <Checkout />
+                  </Grid>
+                )}
+                {store.dashboard.yourProducts && (
+                  <Grid item xs={12} md={12} lg={12}>
+                    <YourProducts />
+                  </Grid>
+                )}
+                {store.dashboard.addProduct && (
+                  <Grid item xs={12} md={12} lg={12}>
+                    <AddProduct />
+                  </Grid>
+                )}
+              </Grid>
+              <Copyright sx={{ pt: 4 }} />
+            </Container>
+          </Box>
         </Box>
-      </Box>
+      )}
     </ThemeProvider>
   );
 }
