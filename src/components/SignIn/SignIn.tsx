@@ -16,9 +16,6 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
-// import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
-import "react-toastify/dist/ReactToastify.css";
 
 function Copyright(props: {
   sx: {
@@ -47,7 +44,6 @@ function Copyright(props: {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
-  // const navigate = useNavigate();
   const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
