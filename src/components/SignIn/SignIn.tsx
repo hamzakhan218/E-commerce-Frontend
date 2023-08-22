@@ -62,15 +62,17 @@ export default function SignIn() {
     axios
       .post(`${backendURL}/auth/login`, data)
       .then((res: { data: { access_token: string } }) => {
-        if (res.data.access_token) {
-          localStorage.setItem("token", res.data.access_token);
-          navigate("/");
-        } else {
-          toast("Error please login again");
-        }
+        console.log("Response from signin: ", res);
+        // if (res.data.access_token) {
+        //   localStorage.setItem("token", res.data.access_token);
+        //   navigate("/");
+        // } else {
+        //   toast("Error please login again");
+        // }
       })
       .catch((error: { response: { data: { message: string[] } } }) => {
-        toast(error.response.data.message[0]);
+        console.log("Error from signin: ", error);
+        // toast(error.response.data.message[0]);
       });
   };
 
