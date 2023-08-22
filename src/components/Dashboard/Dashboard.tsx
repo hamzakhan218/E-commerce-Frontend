@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-floating-promises */
 import * as React from "react";
 import {
   styled,
@@ -156,7 +157,7 @@ export default function Dashboard() {
         dispatch(addSpecificAmount(response.data.items.length));
         setLoader(false);
       };
-      // fetchCart();
+      fetchCart();
     }
     setLoader(false);
   }, []);

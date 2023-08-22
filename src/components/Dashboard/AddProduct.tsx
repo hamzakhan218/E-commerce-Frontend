@@ -4,7 +4,6 @@ import {
   Avatar,
   Button,
   CssBaseline,
-  TextField,
   Grid,
   Box,
   Typography,
@@ -36,7 +35,6 @@ type Inputs = {
 };
 
 function AddProduct() {
-  const [file, setFile] = React.useState<string>();
   const [date, setDate] = React.useState<Date | null>(null);
   const [progress, setProgress] = React.useState<number>(0);
   const { register, handleSubmit } = useForm<Inputs>();
@@ -78,7 +76,7 @@ function AddProduct() {
               name: data.name,
               price: data.price,
               image: filePath,
-              publishDate: data.publishDate,
+              publishDate: date,
               ownerEmail: decodedToken.email,
               description: data.description,
               category: data.category,
