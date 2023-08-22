@@ -66,7 +66,7 @@ export default function SignIn() {
           localStorage.setItem("token", res.data.access_token);
           navigate("/");
         } else {
-          toast(res.data);
+          toast("Error please login again");
         }
       })
       .catch((error: { response: { data: { message: string[] } } }) => {

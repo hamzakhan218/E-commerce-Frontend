@@ -140,7 +140,7 @@ export default function Dashboard() {
 
   React.useEffect(() => {
     if (!localStorage.getItem("token")) {
-      navigate("/signin");
+      // navigate("/signin");
     } else {
       const token: string = localStorage.getItem("token")!;
       setUser(decodeToken(token)!);
@@ -156,8 +156,9 @@ export default function Dashboard() {
         dispatch(addSpecificAmount(response.data.items.length));
         setLoader(false);
       };
-      fetchCart();
+      // fetchCart();
     }
+    setLoader(false);
   }, []);
 
   return (

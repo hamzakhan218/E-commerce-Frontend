@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import * as React from "react";
 import {
   Avatar,
@@ -17,34 +18,32 @@ import axios from "axios";
 import { decodeToken } from "react-jwt";
 import { toast } from "react-toastify";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import ImageUploader, { FileObjectType } from "react-image-upload";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "react-toastify/dist/ReactToastify.css";
 import "react-image-upload/dist/index.css";
 
 const defaultTheme = createTheme();
+type Inputs = {
+  name: string;
+  price: number;
+  image: string;
+  publishDate: Date;
+  ownerEmail: string;
+  description: string;
+  category: string;
+  stock: number;
+};
 
 function AddProduct() {
-  const [fileUploadStatus, setFileUploadStatus] = React.useState(true);
   const [file, setFile] = React.useState<string>();
   const [date, setDate] = React.useState<Date | null>(null);
   const [progress, setProgress] = React.useState<number>(0);
+  const { register, handleSubmit } = useForm<Inputs>();
 
-  async function getImageFileObject(imageFile: { file: File }) {
-    try {
-      const formData = new FormData();
-      formData.append("file", imageFile.file);
-
-      const response: {
-        data: {
-          value: {
-            cid: string;
-            files: {
-              name: string;
-            }[];
-          };
-        };
-      } = await axios.post("https://api.nft.storage/upload", formData, {
+  const onSubmit: SubmitHandler<Inputs> = (data) => {
+    axios
+      .post("https://api.nft.storage/upload", data.image[0], {
         headers: {
           Authorization:
             "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweGE2ZGI0NjViQkY0OUMwYTEzNTE3MzgyOTNhN0IzOEQ1OGI4NjI3ODAiLCJpc3MiOiJuZnQtc3RvcmFnZSIsImlhdCI6MTY4MDcxNTUzNDQ0MywibmFtZSI6InRlem9zIn0.gjIvn3WJvw2KxsWXOWCzXCMv8rixUAQSuB-MJYVxi9A",
@@ -54,47 +53,47 @@ function AddProduct() {
           const progress = Math.round((loaded * 100) / total!);
           setProgress(progress);
         },
-      });
-
-      const filePath: string =
-        "https://ipfs.io/ipfs/" +
-        response.data.value.cid +
-        "/" +
-        response.data.value.files[0].name;
-      setFile(filePath);
-      setFileUploadStatus(!fileUploadStatus);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const res = new FormData(event.currentTarget);
-    const token: string = localStorage.getItem("token")!;
-    const decodedToken: { email: string } = decodeToken<{ email: string }>(
-      token
-    )!;
-    const backendURL = import.meta.env.VITE_BACKEND_URL as string;
-
-    const data = {
-      name: res.get("name"),
-      price: parseInt(res.get("price")),
-      image: file,
-      publishDate: date,
-      ownerEmail: decodedToken.email,
-      description: res.get("description"),
-      category: res.get("category"),
-      stock: parseInt(res.get("stock")),
-    };
-
-    axios
-      .post(`${backendURL}/products`, data)
-      .then((res) => {
-        toast.success(res.statusText);
       })
-      .catch((error: { response: { data: { message: string[] } } }) => {
-        toast(error.response.data.message[0]);
+      .then(
+        (response: {
+          data: {
+            value: {
+              cid: string;
+              files: {
+                name: string;
+              }[];
+            };
+          };
+        }) => {
+          const filePath: string =
+            "https://ipfs.io/ipfs/" + response.data.value.cid;
+          console.log(filePath);
+          const token: string = localStorage.getItem("token")!;
+          const decodedToken: { email: string } = decodeToken<{
+            email: string;
+          }>(token)!;
+          const backendURL = import.meta.env.VITE_BACKEND_URL as string;
+          axios
+            .post(`${backendURL}/products`, {
+              name: data.name,
+              price: data.price,
+              image: filePath,
+              publishDate: data.publishDate,
+              ownerEmail: decodedToken.email,
+              description: data.description,
+              category: data.category,
+              stock: data.stock,
+            })
+            .then((res) => {
+              toast.success(res.statusText);
+            })
+            .catch((error: { response: { data: { message: string[] } } }) => {
+              toast(error.response.data.message[0]);
+            });
+        }
+      )
+      .catch((error) => {
+        console.log(error);
       });
   };
 
@@ -116,71 +115,52 @@ function AddProduct() {
           <Typography component='h1' variant='h5'>
             Add a Product
           </Typography>
-          <Box
-            component='form'
-            onSubmit={handleSubmit}
-            noValidate
-            sx={{ mt: 1 }}
-          >
+          <form onSubmit={handleSubmit(onSubmit)}>
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  id='name'
-                  label='Name'
-                  name='name'
-                  autoFocus
+                <input
+                  placeholder='Name'
+                  className='px-5 py-4 bg-[#f5f5f5] border rounded '
+                  {...register("name", { required: true })}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  name='price'
-                  label='Price'
+                <input
+                  placeholder='Price'
                   type='number'
-                  id='price'
+                  className='px-5 py-4 bg-[#f5f5f5] border rounded '
+                  {...register("price", { required: true })}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  name='category'
-                  label='Category'
-                  id='category'
+                <input
+                  placeholder='Category'
+                  className='px-5 py-4 bg-[#f5f5f5] border rounded '
+                  {...register("category", { required: true })}
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
-                <TextField
-                  margin='normal'
-                  required
-                  fullWidth
-                  name='stock'
-                  label='Stock'
+                <input
+                  placeholder='Stock'
                   type='number'
-                  id='stock'
+                  className='px-5 py-4 bg-[#f5f5f5] border rounded '
+                  {...register("stock", { required: true })}
                 />
               </Grid>
             </Grid>
-            <TextField
-              margin='normal'
-              required
-              fullWidth
-              name='description'
-              label='Description'
-              id='description'
+            <input
+              placeholder='Description'
+              className='px-5 py-4 bg-[#f5f5f5] border rounded '
+              {...register("description", { required: true })}
             />
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
-                <ImageUploader
-                  onFileAdded={async (img: { file: FileObjectType }) =>
-                    await getImageFileObject(img)
-                  }
+                <input
+                  {...register("image", {
+                    required: "picture is required",
+                  })}
+                  type='file'
+                  id='picture'
                 />
               </Grid>
               <Grid item xs={12} sm={6}>
@@ -202,11 +182,10 @@ function AddProduct() {
               fullWidth
               variant='contained'
               sx={{ mt: 3, mb: 2 }}
-              disabled={fileUploadStatus}
             >
               Save
             </Button>
-          </Box>
+          </form>
         </Box>
       </Container>
     </ThemeProvider>
