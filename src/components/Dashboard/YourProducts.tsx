@@ -7,17 +7,21 @@ import ListProduct from "../Products/ListProduct";
 function YourProducts() {
   const [products, setProducts] = React.useState<Product[]>();
 
-  const fetchData = async () => {
+  const fetchData = () => {
     const backendURL = import.meta.env.VITE_BACKEND_URL as string;
     const token: string = localStorage.getItem("token")!;
     const decodedToken: { email: string } = decodeToken<{ email: string }>(
       token
     )!;
 
-    const response: { data: Product[] } = await axios.get(
-      `${backendURL}/products/users/${decodedToken.email}`
-    );
-    setProducts(response.data);
+    axios
+      .get(`${backendURL}/products/users/${decodedToken.email}`)
+      .then((response: { data: { documents: Product[] | [] } }) => {
+        setProducts(response.data.documents);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   React.useEffect(() => {

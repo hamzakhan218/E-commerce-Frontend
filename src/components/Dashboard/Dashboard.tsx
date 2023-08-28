@@ -150,12 +150,17 @@ export default function Dashboard() {
         const decodedToken: { email: string } = decodeToken<{ email: string }>(
           token
         )!;
-        const response: { data: { items: [] } } = await axios.get(
-          `${backendURL}/cart/email/${decodedToken.email}`
-        );
-        console.log(response);
-        dispatch(addSpecificAmount(response.data.items.length));
-        setLoader(false);
+        // const response: { data: { document: { items: [] } | null } } =
+        await axios
+          .get(`${backendURL}/cart/email/${decodedToken.email}`)
+          .then((res: { data: { document: { items: [] } | null } }) => {
+            if (res.data.document) {
+              dispatch(addSpecificAmount(res.data.document.items.length));
+            } else {
+            }
+            setLoader(false);
+          })
+          .catch((Error) => console.log(Error));
       };
       fetchCart();
     }

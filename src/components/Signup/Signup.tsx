@@ -60,8 +60,8 @@ export default function SignUp() {
 
     axios
       .post(`${backendURL}/users`, data)
-      .then((response: { data: { id: string } }) => {
-        if (response.data?.id) {
+      .then((response: { data: { insertedId: string | undefined } }) => {
+        if (response.data.insertedId) {
           toast("Account created please login");
           navigate("/signin");
         } else {
