@@ -157,8 +157,8 @@ export default function Dashboard() {
             if (res.data.document) {
               dispatch(addSpecificAmount(res.data.document.items.length));
             } else {
+              dispatch(addSpecificAmount(0));
             }
-            setLoader(false);
           })
           .catch((Error) => console.log(Error));
       };

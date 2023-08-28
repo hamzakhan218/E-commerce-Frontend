@@ -27,14 +27,17 @@ export default function Review() {
     axios
       .get(`${backendURL}/cart/email/${decodedToken.email}`)
       .then((response: { data: { document: { items: [] } } }) => {
-        let totalAmount = 0;
-        response.data.document.items.map(
-          (product: { product: { price: number } }) => {
-            totalAmount += product.product.price;
-          }
-        );
-        setAmount(totalAmount);
-        setProducts(response.data.document.items);
+        if (response.data.document) {
+          let totalAmount = 0;
+          response.data.document.items.map(
+            (product: { product: { price: number } }) => {
+              totalAmount += product.product.price;
+            }
+          );
+          setAmount(totalAmount);
+          setProducts(response.data.document?.items);
+        }
+
         setLoader(false);
       })
       .catch((error) => console.log(error));
@@ -72,10 +75,7 @@ export default function Review() {
         ) : (
           products.map((product: { product: Product }, key) => (
             <ListItem key={key} sx={{ py: 1, px: 0 }}>
-              <ListItemText
-                primary={product.product.name}
-                secondary={product.product.description}
-              />
+              <ListItemText primary={product.product.name} />
               <Typography variant='body2'>${product.product.price}</Typography>
             </ListItem>
           ))
