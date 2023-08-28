@@ -6,21 +6,28 @@ import { Product } from "../Dashboard/BrowseProducts";
 
 function SingleProduct() {
   const { id } = useParams();
-  const [product, setproduct] = React.useState<Product>();
+  const [product, setProduct] = React.useState<Product>();
   const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
-  const fetchData = async () => {
-    const response: { data: Product } = await axios.get(
-      `${backendURL}/products/${id!}`
-    );
-    setproduct(response.data);
+  const fetchData = () => {
+    axios
+      .get(`${backendURL}/products/${id!}`)
+      .then(
+        (response: {
+          data: {
+            document: Product;
+          };
+        }) => {
+          setProduct(response.data.document);
+        }
+      )
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   React.useEffect(() => {
-    const initialRun = async () => {
-      await fetchData();
-    };
-    initialRun();
+    fetchData();
   });
 
   return (

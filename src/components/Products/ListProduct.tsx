@@ -91,12 +91,12 @@ const ListProduct = (product: { product: Product }) => {
   };
 
   return (
-    <div className='outline '>
-      <div className='border border-[#e4e4e4] h-[300px] mb-4 relative overflow-hidden group transition'>
+    <div className='outline rounded-2xl hover:shadow-3xl'>
+      <div className='border border-[#e4e4e4] rounded-2xl h-[300px] mb-4 relative overflow-hidden group transition'>
         <div className='w-full h-full flex items-center justify-center'>
           <div className='w-[200px] mx-auto flex justify-center items-center'>
             <img
-              className='h-full group-hover:scale-110 transition duration-300'
+              className='h-full  group-hover:scale-110 transition duration-300'
               src={image}
               alt='product'
             />
@@ -133,7 +133,7 @@ const ListProduct = (product: { product: Product }) => {
         <div className='text-sm font-thin'>
           <Link to={`/product/${_id}`}>
             <h2 className='  mb-1 font-medium'>{name}</h2>
-            <h2 className=' font-thin mb-1'>{description}</h2>
+            {/* <h2 className=' font-thin mb-1'>{description}</h2> */}
             <h2 className='  mb-1 font-medium'>Stock: {stock}</h2>
           </Link>
         </div>
