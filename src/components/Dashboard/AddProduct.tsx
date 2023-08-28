@@ -25,13 +25,13 @@ import "react-image-upload/dist/index.css";
 const defaultTheme = createTheme();
 type Inputs = {
   name: string;
-  price: number;
+  price: string;
   image: string;
   publishDate: Date;
   ownerEmail: string;
   description: string;
   category: string;
-  stock: number;
+  stock: string;
 };
 
 function AddProduct() {
@@ -65,28 +65,32 @@ function AddProduct() {
         }) => {
           const filePath: string =
             "https://ipfs.io/ipfs/" + response.data.value.cid;
-          console.log(filePath);
           const token: string = localStorage.getItem("token")!;
           const decodedToken: { email: string } = decodeToken<{
             email: string;
           }>(token)!;
           const backendURL = import.meta.env.VITE_BACKEND_URL as string;
+
           axios
             .post(`${backendURL}/products`, {
               name: data.name,
-              price: data.price,
+              price: parseInt(data.price),
               image: filePath,
               publishDate: date,
               ownerEmail: decodedToken.email,
               description: data.description,
               category: data.category,
-              stock: data.stock,
+              stock: parseInt(data.stock),
             })
-            .then((res) => {
-              toast.success(res.statusText);
+            .then((res: { data: { insertedId: string | null } }) => {
+              console.log(res);
+              if (res.data.insertedId) {
+                toast.success("Item added.");
+              }
             })
             .catch((error: { response: { data: { message: string[] } } }) => {
-              toast(error.response.data.message[0]);
+              // toast(error.response.data.message[0]);
+              console.log(error);
             });
         }
       )

@@ -16,22 +16,26 @@ export default function Review() {
   const [products, setProducts] = React.useState([]);
   const [amount, setAmount] = React.useState<number>(0);
 
-  const fetchData = async () => {
+  const fetchData = () => {
     const token: string = localStorage.getItem("token")!;
     const decodedToken: { email: string } = decodeToken<{ email: string }>(
       token
     )!;
     const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
-    const response: { data: { items: [] } } = await axios.get(
-      `${backendURL}/cart/email/${decodedToken.email}`
-    );
-    let totalAmount = 0;
-    response.data.items.map((product: { product: { price: number } }) => {
-      totalAmount += product.product.price;
-    });
-    setAmount(totalAmount);
-    setProducts(response.data.items);
+    axios
+      .get(`${backendURL}/cart/email/${decodedToken.email}`)
+      .then((response: { data: { document: { items: [] } } }) => {
+        let totalAmount = 0;
+        response.data.document.items.map(
+          (product: { product: { price: number } }) => {
+            totalAmount += product.product.price;
+          }
+        );
+        setAmount(totalAmount);
+        setProducts(response.data.document.items);
+      })
+      .catch((error) => console.log(error));
   };
 
   React.useEffect(() => {

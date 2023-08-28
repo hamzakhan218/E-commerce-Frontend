@@ -16,6 +16,9 @@ import {
 } from "@mui/material";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import axios from "axios";
+import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
+import "react-toastify/dist/ReactToastify.css";
 
 function Copyright(props: {
   sx: {
@@ -44,6 +47,7 @@ function Copyright(props: {
 const defaultTheme = createTheme();
 
 export default function SignIn() {
+  const navigate = useNavigate();
   const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -57,18 +61,21 @@ export default function SignIn() {
 
     axios
       .post(`${backendURL}/auth/login`, data)
-      .then((res: { data: { access_token: string } }) => {
-        console.log("Response from signin: ", res);
-        // if (res.data.access_token) {
-        //   localStorage.setItem("token", res.data.access_token);
-        //   navigate("/");
-        // } else {
-        //   toast("Error please login again");
-        // }
-      })
+      .then(
+        (res: {
+          data: { access_token: string | undefined; message: string };
+        }) => {
+          if (res.data.access_token) {
+            localStorage.setItem("token", res.data.access_token);
+            toast(res.data.message);
+            navigate("/");
+          } else {
+            toast(res.data.message);
+          }
+        }
+      )
       .catch((error: { response: { data: { message: string[] } } }) => {
-        console.log("Error from signin: ", error);
-        // toast(error.response.data.message[0]);
+        toast(error.response.data.message[0]);
       });
   };
 

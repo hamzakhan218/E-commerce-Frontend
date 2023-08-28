@@ -27,11 +27,15 @@ function BrowseProducts() {
   const [products, setProducts] = React.useState<Product[]>([]);
   const backendURL = import.meta.env.VITE_BACKEND_URL as string;
 
-  const fetchProducts = async () => {
-    const response: { data: Product[] } = await axios.get(
-      `${backendURL}/products`
-    );
-    setProducts(response.data);
+  const fetchProducts = () => {
+    axios
+      .get(`${backendURL}/products`)
+      .then((res: { data: { documents: Product[] | [] } }) => {
+        setProducts(res.data.documents);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   };
 
   React.useEffect(() => {
