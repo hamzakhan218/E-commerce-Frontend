@@ -35,17 +35,19 @@ const ListProduct = (product: { product: Product }) => {
 
     const doesCartExists: {
       data: {
-        ownerEmail: string;
-        items: [];
-        _id: string;
+        document: {
+          ownerEmail: string;
+          items: [];
+          _id: string;
+        };
       };
     } = await axios.get(`${backendURL}/cart/email/${decodedToken.email}`);
 
-    if (doesCartExists.data) {
+    if (doesCartExists.data.document) {
       const data = {
-        ownerEmail: doesCartExists.data.ownerEmail,
+        ownerEmail: doesCartExists.data.document.ownerEmail,
         items: [
-          ...doesCartExists.data.items,
+          ...doesCartExists.data.document.items,
           {
             product: {
               name,
@@ -63,7 +65,10 @@ const ListProduct = (product: { product: Product }) => {
           },
         ],
       };
-      await axios.put(`${backendURL}/cart/${doesCartExists.data._id}`, data);
+      await axios.put(
+        `${backendURL}/cart/${doesCartExists.data.document._id}`,
+        data
+      );
     } else {
       await axios.post(`${backendURL}/cart`, {
         ownerEmail: decodedToken.email,
