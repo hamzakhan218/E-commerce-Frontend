@@ -15,6 +15,7 @@ const payments = [
 export default function Review() {
   const [products, setProducts] = React.useState([]);
   const [amount, setAmount] = React.useState<number>(0);
+  const [loader, setLoader] = React.useState<boolean>(true);
 
   const fetchData = () => {
     const token: string = localStorage.getItem("token")!;
@@ -34,6 +35,7 @@ export default function Review() {
         );
         setAmount(totalAmount);
         setProducts(response.data.document.items);
+        setLoader(false);
       })
       .catch((error) => console.log(error));
   };
@@ -48,15 +50,36 @@ export default function Review() {
         Order summary
       </Typography>
       <List disablePadding>
-        {products.map((product: { product: Product }, key) => (
-          <ListItem key={key} sx={{ py: 1, px: 0 }}>
-            <ListItemText
-              primary={product.product.name}
-              secondary={product.product.description}
-            />
-            <Typography variant='body2'>${product.product.price}</Typography>
-          </ListItem>
-        ))}
+        {loader ? (
+          <>
+            <div className='relative flex w-auto animate-pulse gap-2 p-4'>
+              <div className='h-12 w-12 rounded-full bg-slate-400'></div>
+              <div className='flex-1'>
+                <div className='mb-1 h-5 w-3/5 rounded-lg bg-slate-400 text-lg'></div>
+                <div className='h-5 w-[90%] rounded-lg bg-slate-400 text-sm'></div>
+              </div>
+              <div className='absolute bottom-5 right-0 h-4 w-4 rounded-full bg-slate-400'></div>
+            </div>
+            <div className='relative flex w-auto animate-pulse gap-2 p-4'>
+              <div className='h-12 w-12 rounded-full bg-slate-400'></div>
+              <div className='flex-1'>
+                <div className='mb-1 h-5 w-3/5 rounded-lg bg-slate-400 text-lg'></div>
+                <div className='h-5 w-[90%] rounded-lg bg-slate-400 text-sm'></div>
+              </div>
+              <div className='absolute bottom-5 right-0 h-4 w-4 rounded-full bg-slate-400'></div>
+            </div>
+          </>
+        ) : (
+          products.map((product: { product: Product }, key) => (
+            <ListItem key={key} sx={{ py: 1, px: 0 }}>
+              <ListItemText
+                primary={product.product.name}
+                secondary={product.product.description}
+              />
+              <Typography variant='body2'>${product.product.price}</Typography>
+            </ListItem>
+          ))
+        )}
         <ListItem sx={{ py: 1, px: 0 }}>
           <ListItemText primary='Total' />
           <Typography variant='subtitle1' sx={{ fontWeight: 700 }}>
